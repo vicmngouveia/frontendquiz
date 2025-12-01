@@ -32,7 +32,7 @@ async function buscarPerguntas() {
     isLoading = true; // Indica carregamento
     
     // Mostra um estado de carregamento enquanto busca
-    app.innerHTML = <div class="page-container text-center"><div class="card-custom"><h2 class="fw-bold">Carregando Perguntas...</h2><div class="spinner-border text-info mt-3" role="status"></div></div></div>;
+    app.innerHTML = `<div class="page-container text-center"><div class="card-custom"><h2 class="fw-bold">Carregando Perguntas...</h2><div class="spinner-border text-info mt-3" role="status"></div></div></div>`;
 
     try {
         const PerguntaClasse = Parse.Object.extend("Pergunta");
@@ -69,7 +69,7 @@ async function buscarPerguntas() {
     } catch (error) {
         console.error("FALHA: Erro ao carregar perguntas do Back4App: ", error);
         isLoading = false;
-        app.innerHTML = <div class="page-container text-center"><div class="card-custom"><h2 class="fw-bold text-danger">Erro de Conexão</h2><p>Não foi possível carregar o quiz. Verifique as permissões da classe "Pergunta" no Back4App.</p><p class="text-muted">Detalhes do Erro: ${error.message}</p></div></div>;
+        app.innerHTML = `<div class="page-container text-center"><div class="card-custom"><h2 class="fw-bold text-danger">Erro de Conexão</h2><p>Não foi possível carregar o quiz. Verifique as permissões da classe "Pergunta" no Back4App.</p><p class="text-muted">Detalhes do Erro: ${error.message}</p></div></div>`;
     }
 }
 
@@ -79,7 +79,7 @@ async function buscarPerguntas() {
 // ===============================================
 
 function materialHeader(title) {
-    return <h2 class="fw-bold text-center mb-4">${title}</h2>;
+    return `<h2 class="fw-bold text-center mb-4">${title}</h2>`;
 }
 
 function renderLogin(message = '') {
@@ -87,7 +87,7 @@ function renderLogin(message = '') {
         <div class="page-container">
             <div class="card-custom">
                 ${materialHeader("QuizMaster")}
-                ${message ? <div class="alert alert-danger p-2 mb-3 text-center">${message}</div> : ''}
+                ${message ? `<div class="alert alert-danger p-2 mb-3 text-center">${message}</div>` : ''}
                 <input id="loginUser" class="form-control mb-2" placeholder="Usuário" />
                 <input id="loginPass" type="password" class="form-control mb-3" placeholder="Senha" />
                 <button class="btn btn-main w-100 mb-3" onclick="login()">Entrar</button>
@@ -191,7 +191,7 @@ function renderQuestion() {
 
     const optionsHtml = optionsArray.map((option, index) => {
         // Chamamos a função answer com o índice da opção clicada
-        return <div class="quiz-option" onclick="answer(${index})">${option}</div>;
+        return `<div class="quiz-option" onclick="answer(${index})">${option}</div>`;
     }).join('');
 
 
