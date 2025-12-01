@@ -32,7 +32,7 @@ async function buscarPerguntas() {
     isLoading = true; // Indica carregamento
     
     // Mostra um estado de carregamento enquanto busca
-    app.innerHTML = `<div class="page-container text-center"><div class="card-custom"><h2 class="fw-bold">Carregando Perguntas...</h2><div class="spinner-border text-info mt-3" role="status"></div></div></div>`;
+    app.innerHTML = <div class="page-container text-center"><div class="card-custom"><h2 class="fw-bold">Carregando Perguntas...</h2><div class="spinner-border text-info mt-3" role="status"></div></div></div>;
 
     try {
         const PerguntaClasse = Parse.Object.extend("Pergunta");
@@ -69,7 +69,7 @@ async function buscarPerguntas() {
     } catch (error) {
         console.error("FALHA: Erro ao carregar perguntas do Back4App: ", error);
         isLoading = false;
-        app.innerHTML = `<div class="page-container text-center"><div class="card-custom"><h2 class="fw-bold text-danger">Erro de Conexão</h2><p>Não foi possível carregar o quiz. Verifique as permissões da classe "Pergunta" no Back4App.</p><p class="text-muted">Detalhes do Erro: ${error.message}</p></div></div>`;
+        app.innerHTML = <div class="page-container text-center"><div class="card-custom"><h2 class="fw-bold text-danger">Erro de Conexão</h2><p>Não foi possível carregar o quiz. Verifique as permissões da classe "Pergunta" no Back4App.</p><p class="text-muted">Detalhes do Erro: ${error.message}</p></div></div>;
     }
 }
 
@@ -79,7 +79,7 @@ async function buscarPerguntas() {
 // ===============================================
 
 function materialHeader(title) {
-    return `<h2 class="fw-bold text-center mb-4">${title}</h2>`;
+    return <h2 class="fw-bold text-center mb-4">${title}</h2>;
 }
 
 function renderLogin(message = '') {
@@ -87,7 +87,7 @@ function renderLogin(message = '') {
         <div class="page-container">
             <div class="card-custom">
                 ${materialHeader("QuizMaster")}
-                ${message ? `<div class="alert alert-danger p-2 mb-3 text-center">${message}</div>` : ''}
+                ${message ? <div class="alert alert-danger p-2 mb-3 text-center">${message}</div> : ''}
                 <input id="loginUser" class="form-control mb-2" placeholder="Usuário" />
                 <input id="loginPass" type="password" class="form-control mb-3" placeholder="Senha" />
                 <button class="btn btn-main w-100 mb-3" onclick="login()">Entrar</button>
@@ -191,7 +191,7 @@ function renderQuestion() {
 
     const optionsHtml = optionsArray.map((option, index) => {
         // Chamamos a função answer com o índice da opção clicada
-        return `<div class="quiz-option" onclick="answer(${index})">${option}</div>`;
+        return <div class="quiz-option" onclick="answer(${index})">${option}</div>;
     }).join('');
 
 
@@ -241,9 +241,8 @@ function showScore() {
 }
 
 // Função de Logout (apenas limpa o local storage e volta ao login)
-function logout() {
-    localStorage.removeItem("user");
-    localStorage.removeItem("pass");
+async function logout() {
+    await Parse.User.logOut();
     renderLogin();
 }
 
@@ -251,27 +250,35 @@ function logout() {
 // AUTENTICAÇÃO SIMPLIFICADA (SUBSTITUINDO ALERT)
 // A ideal seria usar Parse.User.signUp e Parse.User.logIn
 
-function register() {
-    const user = document.getElementById("regUser").value;
-    const pass = document.getElementById("regPass").value;
+async function register() {
+     const username = document.getElementById("regUser").value;
+    const password = document.getElementById("regPass").value;
 
-    if (!user || !pass) {
+    if (!username || !password) {
         renderRegister("Preencha todos os campos.");
         return;
     }
-    localStorage.setItem("user", user);
-    localStorage.setItem("pass", pass);
-    renderLogin("Registro realizado com sucesso! Faça o login.");
+
+    const user = new Parse.User();
+    user.set("username", username);
+    user.set("password", password);
+
+    try {
+        await user.signUp();
+        renderLogin("Conta criada com sucesso! Faça o login.");
+    } catch (err) {
+        renderRegister("Erro: " + err.message);
+    }
 }
 
-function login() {
-    let u = document.getElementById("loginUser").value;
-    let p = document.getElementById("loginPass").value;
-    
-    // ATENÇÃO: Substituição de alert() por renderização de mensagem
-    if (u === localStorage.getItem("user") && p === localStorage.getItem("pass")) {
+async function login() {
+     const username = document.getElementById("loginUser").value;
+    const password = document.getElementById("loginPass").value;
+
+    try {
+        await Parse.User.logIn(username, password);
         renderHome();
-    } else {
+    } catch (err) {
         renderLogin("Usuário ou senha incorretos!");
     }
 }
